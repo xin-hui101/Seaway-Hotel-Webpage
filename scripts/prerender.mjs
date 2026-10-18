@@ -3,8 +3,24 @@
 // so search engines can read every word without running JavaScript.
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
+import { build } from 'vite';
+import react from '@vitejs/plugin-react';
 
+// Bundle the app for Node with its own minimal settings (configFile: false), so plugins that
+// hosts such as Cloudflare add to vite.config.js cannot rename or reshape this file.
 const ssrDir = 'dist/.ssr';
+await build({
+  configFile: false,
+  plugins: [react()],
+  logLevel: 'warn',
+  publicDir: false,
+  build: {
+    ssr: 'src/entry-server.jsx',
+    outDir: ssrDir,
+    emptyOutDir: true,
+    rollupOptions: { output: { entryFileNames: 'entry-server.js' } },
+  },
+});
 const { render, SEO, SITE_URL, LANG_PATH, OG_IMAGE, hotelSchema } = await import(
   pathToFileURL(`${ssrDir}/entry-server.js`).href
 );
