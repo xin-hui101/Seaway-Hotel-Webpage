@@ -17,11 +17,14 @@ const CHECK_IN_HOUR = 15;
 
 /** Current time in Mersing (UTC+8), refreshed every 30 seconds. */
 function useMersingTime() {
-  const [now, setNow] = useState(() => new Date());
+  // null until the page runs in the browser, so the pre-rendered page has no stale time in it
+  const [now, setNow] = useState(null);
   useEffect(() => {
+    setNow(new Date());
     const id = setInterval(() => setNow(new Date()), 30000);
     return () => clearInterval(id);
   }, []);
+  if (!now) return null;
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kuala_Lumpur', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' })
       .formatToParts(now).map((p) => [p.type, Number(p.value)]),
@@ -33,8 +36,8 @@ function useMersingTime() {
 export default function Location() {
   const { t, L } = useLang();
   const clock = useMersingTime();
-  const canCheckIn = clock.hour >= CHECK_IN_HOUR;
-  const minsLeft = (CHECK_IN_HOUR - clock.hour) * 60 - clock.minute;
+  const canCheckIn = clock && clock.hour >= CHECK_IN_HOUR;
+  const minsLeft = clock && (CHECK_IN_HOUR - clock.hour) * 60 - clock.minute;
   const q = encodeURIComponent(CONTACT.mapsQuery);
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${q}`;
   const dirUrl = `https://www.google.com/maps/dir/?api=1&destination=${q}`;
@@ -87,7 +90,7 @@ export default function Location() {
                   <Icon name={it.icon} />
                   <div>
                     <b>{L(it.title)}</b><span>{L(it.text)}</span>
-                    {it.icon === 'clock' && (
+                    {it.icon === 'clock' && clock && (
                       <span className={`loc-live ${canCheckIn ? 'is-open' : ''}`}>
                         <i />{t('loc.now', { time: clock.label })} · {canCheckIn
                           ? t('loc.canCheckIn')

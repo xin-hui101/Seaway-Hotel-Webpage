@@ -9,11 +9,12 @@ const DURATION = 1000; // slide time in ms, keep in sync with .fp__track transit
 
 /** True when the screen is big enough for one-section-per-screen paging. */
 export function useFullPageEnabled(query = '(min-width: 901px) and (min-height: 600px)') {
-  const get = () => typeof window !== 'undefined' && window.matchMedia(query).matches;
-  const [enabled, setEnabled] = useState(get);
+  // Starts false (like the pre-rendered page) and switches on after the first paint
+  const [enabled, setEnabled] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia(query);
     const on = () => setEnabled(mq.matches);
+    on();
     mq.addEventListener('change', on);
     return () => mq.removeEventListener('change', on);
   }, [query]);

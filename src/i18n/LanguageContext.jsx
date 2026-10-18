@@ -1,24 +1,34 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { STRINGS } from './strings';
+import { LANG_PATH, SEO } from '../data/site';
 
-const KEY = 'seaway-lang';
+export const LANG_KEY = 'seaway-lang';
 const LanguageContext = createContext(null);
 
-const initialLang = () => {
+/** Language the visitor picked before, or their browser language. */
+export const preferredLang = () => {
   try {
-    const saved = localStorage.getItem(KEY);
+    const saved = localStorage.getItem(LANG_KEY);
     if (saved === 'en' || saved === 'zh') return saved;
   } catch { /* storage blocked: fall through */ }
   return navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
 };
 
-export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState(initialLang);
+/** `initial` comes from the page address (/ or /zh/), so the pre-rendered page and the app agree. */
+export function LanguageProvider({ initial = 'en', children }) {
+  const [lang, setLang] = useState(initial);
 
   useEffect(() => {
-    document.documentElement.lang = lang === 'zh' ? 'zh-Hans' : 'en';
-    document.documentElement.dataset.lang = lang;
-    try { localStorage.setItem(KEY, lang); } catch { /* ignore */ }
+    const root = document.documentElement;
+    root.lang = lang === 'zh' ? 'zh-Hans' : 'en';
+    root.dataset.lang = lang;
+    document.title = SEO[lang].title;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', SEO[lang].description);
+    // Keep the address in step with the language, so a shared link opens the same version
+    if (location.pathname !== LANG_PATH[lang]) {
+      history.replaceState(null, '', LANG_PATH[lang] + location.search + location.hash);
+    }
+    try { localStorage.setItem(LANG_KEY, lang); } catch { /* ignore */ }
   }, [lang]);
 
   /** UI string by key, with {placeholders}. */
