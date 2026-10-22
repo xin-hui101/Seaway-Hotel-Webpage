@@ -1,4 +1,4 @@
-# Seaway Hotel · Mersing
+# Seaway Hotel
 
 A bilingual (English / 中文) website for **Seaway Hotel**, a boutique hotel at 11, Jalan Abu Bakar, Mersing, Johor, Malaysia. Built with React and Vite, pre-rendered for search engines, and hosted on Cloudflare.
 
