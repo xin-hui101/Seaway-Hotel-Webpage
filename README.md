@@ -2,7 +2,7 @@
 
 A bilingual (English / 中文) website for **Seaway Hotel**, a boutique hotel at 11, Jalan Abu Bakar, Mersing, Johor, Malaysia. Built with React and Vite, pre-rendered for search engines, and hosted on Cloudflare.
 
-**Live site:** [xinhuidemo.tech](https://xinhuidemo.tech) · 中文版：[xinhuidemo.tech/zh/](https://xinhuidemo.tech/zh/)
+**Live site:** https://seaway-hotel-webpage.xinhui100103.workers.dev/
 
 ![Home page](docs/screenshots/home-en.jpg)
 
